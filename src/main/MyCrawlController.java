@@ -1,5 +1,7 @@
 package main;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +10,7 @@ import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
+import stat.CrawlStat;
 
 /**
  * @author Maolin Tu
@@ -26,7 +29,7 @@ public class MyCrawlController {
      * numberOfCrawlers shows the number of concurrent threads that should
      * be initiated for crawling.
      */
-        int numberOfCrawlers = 2;
+        int numberOfCrawlers = 5;
 
         CrawlConfig config = new CrawlConfig();
 
@@ -42,13 +45,13 @@ public class MyCrawlController {
      * You can set the maximum crawl depth here. The default value is -1 for
      * unlimited depth
      */
-        config.setMaxDepthOfCrawling(5);
+        config.setMaxDepthOfCrawling(3);
 
     /*
      * You can set the maximum number of pages to crawl. The default value
      * is -1 for unlimited number of pages
      */
-        config.setMaxPagesToFetch(500);
+        config.setMaxPagesToFetch(10);
 
         /**
          * Do you want crawler4j to crawl also binary data ?
@@ -85,5 +88,17 @@ public class MyCrawlController {
      * will reach the line after this only when crawling is finished.
      */
         controller.start(MyCrawler.class, numberOfCrawlers);
+        
+        long totalFetch = 0;
+        /*
+         * collect local data after crawling
+         */       
+        List<Object> crawlersLocalData = controller.getCrawlersLocalData(); 
+        for (Object localData : crawlersLocalData) {
+            CrawlStat stat = (CrawlStat) localData;
+            totalFetch += stat.getFetchAttempted();
+          }
+        
+        System.out.println("Total fetch_attempted: "+totalFetch);
     }
 }
