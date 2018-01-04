@@ -51,7 +51,7 @@ public class MyCrawlController {
      * You can set the maximum number of pages to crawl. The default value
      * is -1 for unlimited number of pages
      */
-        config.setMaxPagesToFetch(10);
+        config.setMaxPagesToFetch(100);
 
         /**
          * Do you want crawler4j to crawl also binary data ?
@@ -90,6 +90,9 @@ public class MyCrawlController {
         controller.start(MyCrawler.class, numberOfCrawlers);
         
         long totalFetch = 0;
+        long totalSucceed = 0;
+        long totalAborted = 0;
+        long totalFailed = 0;
         /*
          * collect local data after crawling
          */       
@@ -97,8 +100,14 @@ public class MyCrawlController {
         for (Object localData : crawlersLocalData) {
             CrawlStat stat = (CrawlStat) localData;
             totalFetch += stat.getFetchAttempted();
+            totalSucceed += stat.getFetchSucceed();
+            totalAborted += stat.getFetchAborted();
+            totalFailed += stat.getFetchFailed();
           }
         
-        System.out.println("Total fetch_attempted: "+totalFetch);
+        System.out.println("Total totalFetch: "+totalFetch);
+        System.out.println("Total totalSucceed: "+totalSucceed);
+        System.out.println("Total totalAborted: "+totalAborted);
+        System.out.println("Total totalFailed: "+totalFailed);
     }
 }

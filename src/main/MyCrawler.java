@@ -49,8 +49,7 @@ public class MyCrawler extends WebCrawler {
 		int statusCode = referringPage.getStatusCode();
 		logger.info("shouldVisit URL: {}", href);
 		logger.info("shouldVisit StatusCode: {}", statusCode);
-		myCrawlStat.addFetchAttempted();
-		WriteCSV.write(href, String.valueOf(statusCode), "fetch_blog");
+
 		// Ignore the url if it has an extension that matches our defined set of image
 		// extensions.
 		if (FILTERS.matcher(href).matches()) {
@@ -69,12 +68,14 @@ public class MyCrawler extends WebCrawler {
 	@Override
 	public void visit(Page page) {
 		int docid = page.getWebURL().getDocid();
+		int statusCode = page.getStatusCode();
 		String url = page.getWebURL().getURL();
 		String domain = page.getWebURL().getDomain();
 		String path = page.getWebURL().getPath();
 		String subDomain = page.getWebURL().getSubDomain();
 		String parentUrl = page.getWebURL().getParentUrl();
 		String anchor = page.getWebURL().getAnchor();
+		logger.debug("statusCode: {}", statusCode);
 		// logger.debug("Docid: {}", docid);
 		// logger.info("Visit URL: {}", url);
 		// logger.debug("Domain: '{}'", domain);
@@ -82,6 +83,18 @@ public class MyCrawler extends WebCrawler {
 		// logger.debug("Path: '{}'", path);
 		// logger.debug("Parent page: {}", parentUrl);
 		// logger.debug("Anchor text: {}", anchor);
+		
+		
+		myCrawlStat.addFetchAttempted();
+		WriteCSV.write(url, String.valueOf(statusCode), "fetch_blog");
+		
+		if(statusCode>=200&&statusCode<300) {
+			myCrawlStat.addFetchSucceed();
+		}else if(statusCode>=300&&statusCode<400) {
+			myCrawlStat.addFetchAborted();
+		}else if(statusCode>=400) {
+			myCrawlStat.addFetchFailed();
+		}
 
 		if (page.getParseData() instanceof HtmlParseData) {
 			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
@@ -125,7 +138,10 @@ public class MyCrawler extends WebCrawler {
 
 	@Override
 	public void onBeforeExit() {
-		logger.info("fetch_attempted {}: ",myCrawlStat.getFetchAttempted());
+		logger.info("Fetch Attempted {}: ",myCrawlStat.getFetchAttempted());
+		logger.info("Fetch Succeed {}: ",myCrawlStat.getFetchSucceed());
+		logger.info("Fetch Aborted {}: ",myCrawlStat.getFetchAborted());
+		logger.info("Fetch Failed {}: ",myCrawlStat.getFetchFailed());
 	}
 	
 	@Override
