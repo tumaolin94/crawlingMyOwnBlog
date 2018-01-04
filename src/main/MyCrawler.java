@@ -13,6 +13,7 @@ import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
+import util.WriteCSV;
 
 /**
  * @author Maolin Tu
@@ -20,7 +21,9 @@ import edu.uci.ics.crawler4j.url.WebURL;
 public class MyCrawler extends WebCrawler {
 
     private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpg|png)$");
-
+    private static final Pattern FILTERS = Pattern.compile(
+            ".*(\\.(css|js|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v|pdf" +
+            "|rm|smil|wmv|swf|wma|zip|rar|gz"+"bmp|gif|jpg|png"+"))$");
     /**
      * You should implement this function to specify whether the given url
      * should be crawled or not (based on your crawling logic).
@@ -28,9 +31,9 @@ public class MyCrawler extends WebCrawler {
     @Override
     public boolean shouldVisit(Page referringPage, WebURL url) {
         String href = url.getURL().toLowerCase();
-        logger.info("shouldVisit URL: {}", url);
+//        logger.info("shouldVisit URL: {}", url);
         // Ignore the url if it has an extension that matches our defined set of image extensions.
-        if (IMAGE_EXTENSIONS.matcher(href).matches()) {
+        if (FILTERS.matcher(href).matches()) {
             return false;
         }
 
@@ -52,13 +55,13 @@ public class MyCrawler extends WebCrawler {
         String parentUrl = page.getWebURL().getParentUrl();
         String anchor = page.getWebURL().getAnchor();
 
-        logger.debug("Docid: {}", docid);
-        logger.info("Visit URL: {}", url);
-        logger.debug("Domain: '{}'", domain);
-        logger.debug("Sub-domain: '{}'", subDomain);
-        logger.debug("Path: '{}'", path);
-        logger.debug("Parent page: {}", parentUrl);
-        logger.debug("Anchor text: {}", anchor);
+//        logger.debug("Docid: {}", docid);
+//        logger.info("Visit URL: {}", url);
+//        logger.debug("Domain: '{}'", domain);
+//        logger.debug("Sub-domain: '{}'", subDomain);
+//        logger.debug("Path: '{}'", path);
+//        logger.debug("Parent page: {}", parentUrl);
+//        logger.debug("Anchor text: {}", anchor);
 
         if (page.getParseData() instanceof HtmlParseData) {
             HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
@@ -66,14 +69,23 @@ public class MyCrawler extends WebCrawler {
             String html = htmlParseData.getHtml();
             Document doc = Jsoup.parse(html);
             Elements articles = doc.getElementsByTag("article");
-            if(articles.size() == 0)
+            if(articles.size() == 0) {
+            	return;
+            }
             for(Element item : articles) {
-            	logger.debug("id : {}", item.id());
-            	Elements headers = item.getElementsByClass("entry-header");
-            	logger.debug("header : {}", headers.get(0).getElementsByTag("a").get(0).text());
+//            	logger.debug("id : {}", item.id());
+            	Elements headers = item.getElementsByClass("entry-header"); // get header of article
+            	if(headers.get(0).getElementsByTag("a").size() == 0) break; // only fetch articles on main page
+            	Element href = headers.get(0).getElementsByTag("a").get(0);
+//            	logger.debug("header : {}", href.text());
+//            	logger.debug("href : {}", href.attr("abs:href"));
+            	// Writing data into csv
+                String[] contents = new String[2];
+                contents[0] = href.attr("abs:href");
+                contents[1] = href.text().replace(",", "_");
+                WriteCSV.write(contents);
             }
             Set<WebURL> links = htmlParseData.getOutgoingUrls();
-//            logger.debug("Text : {}", text.substring(0, 1000));
             logger.debug("Text length: {}", text.length());
             logger.debug("Html length: {}", html.length());
             logger.debug("Number of outgoing links: {}", links.size());

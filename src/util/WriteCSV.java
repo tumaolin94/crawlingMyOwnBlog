@@ -7,16 +7,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class WriteCSV {
-	public static void write(String[] content) {
+	public static void write(String[] contents) {
 		try {
 			File csv = new File("writers.csv"); // CSV Path
 
 			BufferedWriter bw = new BufferedWriter(new FileWriter(csv, true)); // create
-			for (int i = 0; i < 10; i++) {
-				bw.write("test" + i + "," + "201" + i + ","); //write
-				bw.newLine();// create new line
-			}
 
+			for(String content: contents) {
+				bw.write(content+","); //write
+			}
+			bw.newLine();// create new line
 			bw.close();
 
 		} catch (FileNotFoundException e) {
