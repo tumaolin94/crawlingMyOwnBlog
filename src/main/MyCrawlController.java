@@ -17,7 +17,7 @@ import stat.CrawlStat;
  */
 public class MyCrawlController {
     private static final Logger logger = LoggerFactory.getLogger(MyCrawlController.class);
-
+    private static final String START = "https://www.maolintu.com/";
     public static void main(String[] args) throws Exception {
     /*
      * crawlStorageFolder is a folder where intermediate crawl data is
@@ -51,7 +51,7 @@ public class MyCrawlController {
      * You can set the maximum number of pages to crawl. The default value
      * is -1 for unlimited number of pages
      */
-        config.setMaxPagesToFetch(100);
+        config.setMaxPagesToFetch(50);
 
         /**
          * Do you want crawler4j to crawl also binary data ?
@@ -81,8 +81,9 @@ public class MyCrawlController {
      * URLs that are fetched and then the crawler starts following links
      * which are found in these pages
      */
-        controller.addSeed("https://www.maolintu.com/");
+        controller.addSeed(START);
 
+        
     /*
      * Start the crawl. This is a blocking operation, meaning that your code
      * will reach the line after this only when crawling is finished.
@@ -93,6 +94,7 @@ public class MyCrawlController {
         long totalSucceed = 0;
         long totalAborted = 0;
         long totalFailed = 0;
+
         /*
          * collect local data after crawling
          */       
@@ -103,11 +105,13 @@ public class MyCrawlController {
             totalSucceed += stat.getFetchSucceed();
             totalAborted += stat.getFetchAborted();
             totalFailed += stat.getFetchFailed();
+
           }
         
         System.out.println("Total totalFetch: "+totalFetch);
         System.out.println("Total totalSucceed: "+totalSucceed);
         System.out.println("Total totalAborted: "+totalAborted);
         System.out.println("Total totalFailed: "+totalFailed);
+
     }
 }

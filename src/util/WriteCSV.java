@@ -1,5 +1,7 @@
 package util;
-
+/**
+ * @author Maolin Tu
+ */
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
