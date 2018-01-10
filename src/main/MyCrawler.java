@@ -16,6 +16,7 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 import stat.CrawlStat;
+import util.GetArticles;
 import util.SaveImage;
 import util.WriteCSV;
 
@@ -24,11 +25,12 @@ import util.WriteCSV;
  */
 public class MyCrawler extends WebCrawler {
 
-	private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpeg|jpg|png)$");
+	private static final Pattern IMAGE_EXTENSIONS = Pattern.compile(".*\\.(bmp|gif|jpeg|jpg|png).*$");
 	private static final Pattern FILTERS = Pattern.compile(
 			".*(\\.(css|js|mid|mp2|mp3|mp4|wav|avi|mov|mpeg|ram|m4v" + "|rm|smil|wmv|swf|wma|zip|rar|gz" + "" + "))$");
 
 	private static final String START = "https://www.maolintu.com/";
+	private static final String PAGE = "https://www.maolintu.com/page/";
 	// "https://www.maolintu.com/"
 	/*
 	 * some statistic variables
@@ -127,6 +129,10 @@ public class MyCrawler extends WebCrawler {
 		if(IMAGE_EXTENSIONS.matcher(url).matches()) {
 			SaveImage.saveImage(page, IMAGE_EXTENSIONS, "images");
 		}
+		if(url.equals(START)||url.startsWith(PAGE)) {
+			GetArticles.getAllarticles(page);
+		}
+		
 	}
 
 	@Override

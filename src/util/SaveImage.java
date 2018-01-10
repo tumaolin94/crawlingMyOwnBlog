@@ -28,13 +28,12 @@ public class SaveImage {
         }
         // We are only interested in processing images which are bigger than 10k
         if (!imgPatterns.matcher(url).matches() ||
-            !((page.getParseData() instanceof BinaryParseData) ||
-              (page.getContentData().length < (10 * 1024)))) {
+            !((page.getParseData() instanceof BinaryParseData))) {
             return;
         }
 
         // get a unique name for storing this image
-        String extension = url.substring(url.lastIndexOf('.'));
+        String extension = url.contains("?")?url.substring(url.lastIndexOf('.'), url.lastIndexOf("?")):url.substring(url.lastIndexOf('.'));
         String hashedName = UUID.randomUUID() + extension;
 
         // store image
