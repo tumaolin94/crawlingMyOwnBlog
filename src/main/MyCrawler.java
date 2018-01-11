@@ -31,6 +31,7 @@ public class MyCrawler extends WebCrawler {
 
 	private static final String START = "https://www.maolintu.com/";
 	private static final String PAGE = "https://www.maolintu.com/page/";
+	private static final Pattern CONTENT = Pattern.compile(".*[0-9]{4}\\/[0-9]{2}\\/[0-9]{2}.*$");
 	// "https://www.maolintu.com/"
 	/*
 	 * some statistic variables
@@ -132,6 +133,10 @@ public class MyCrawler extends WebCrawler {
 		if(url.equals(START)||url.startsWith(PAGE)) {
 			GetArticles.getAllarticles(page);
 		}
+		if(CONTENT.matcher(url).matches()) {
+			GetArticles.getArticleContent(page,logger,"contents");
+		}
+		
 		
 	}
 
